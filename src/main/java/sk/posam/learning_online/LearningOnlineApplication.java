@@ -4,6 +4,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import sk.posam.learning_online.application.CategoryCrudRepository;
+import sk.posam.learning_online.application.CourseCrudRepository;
 import sk.posam.learning_online.application.UserCrudRepository;
 
 @SpringBootApplication
@@ -15,7 +17,7 @@ public class LearningOnlineApplication {
 
 	}
 	@Bean
-	CommandLineRunner commandLineRunner(UserCrudRepository userCrudRepository) {
+	CommandLineRunner commandLineRunner(UserCrudRepository userCrudRepository, CategoryCrudRepository categoryCrudRepository, CourseCrudRepository courseCrudRepository) {
 
 
 
@@ -24,8 +26,20 @@ public class LearningOnlineApplication {
 //			michal.addCourse(new Course("Java","Learning java 17"));
 //			Set<Authority> authoritiesSet = new HashSet<>();
 //			authoritiesSet.add(new Authority("ROLE_USER"));
-//			authoritiesSet.add(new Authority("ROLE_ADMIN"));
 //			userCrudRepository.save(michal);
+
+//			Category it = new Category("information technology");
+//			Optional<Course> java = courseCrudRepository.findById(752L);
+//			if(java.isPresent()) {
+//			 Course javaUpdated = java.get();
+//			 javaUpdated.addCategory(it);
+//
+//				courseCrudRepository.save(javaUpdated);
+//			}
+
+
+
+
 
 
 		};

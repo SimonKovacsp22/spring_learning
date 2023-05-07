@@ -39,7 +39,7 @@ public class ProjectSecurityConfig {
                         config.setMaxAge(3600L);
                         return config;
                     }
-                }).and().csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contact","/register")
+                }).and().csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/categories","/register")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
@@ -53,7 +53,7 @@ public class ProjectSecurityConfig {
                 .requestMatchers("/myLoans").hasRole("USER")
                 .requestMatchers("/myCards").hasRole("USER")
                 .requestMatchers("/user").authenticated()
-                .requestMatchers("/notices","/contact","/register").permitAll()
+                .requestMatchers("/notices","/contact","/categories").permitAll()
                 .and().formLogin()
                 .and().httpBasic();
         return http.build();
