@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 @Entity
@@ -23,10 +24,9 @@ public class User {
     private String lastName;
     @Column(unique = true)
     private String email;
-
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Course> courses;
-
+    private List<Course> coursesTaught;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String pwd;
@@ -40,6 +40,23 @@ public class User {
     @OneToMany(mappedBy="user",fetch= FetchType.EAGER,cascade = CascadeType.ALL)
     private Set<Authority> authorities;
 
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "students",fetch = FetchType.EAGER)
+    private Set<Course> coursesTaken = new HashSet<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private List<Rating> ratings;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private Set<Cart> carts;
+
+    private String Avatar;
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Progress> progresses;
+
     public User() {
     }
 
@@ -50,8 +67,20 @@ public class User {
         this.pwd = pwd;
         this.role = role;
         this.createDt = createDt;
-        this.courses = new ArrayList<>();
+        this.coursesTaught = new ArrayList<>();
     }
+
+    public void addCourseToStudy(Course course) {
+        if(!coursesTaught.contains(course)) {
+            coursesTaken.add(course);
+
+        }
+    }
+
+    public Set<Course> getCoursesTaken() {
+        return coursesTaken;
+    }
+
 
     public long getId() {
         return id;
@@ -110,13 +139,13 @@ public class User {
     public void setCreateDt(LocalDateTime createDt) {
         this.createDt = createDt;
     }
-    public List<Course> getCourses() {
-        return courses;
+    public List<Course> getCoursesTaught() {
+        return coursesTaught;
     }
 
-    public void addCourse(Course course) {
-        if(!this.courses.contains(course)){
-            courses.add(course);
+    public void addCourseTaught(Course course) {
+        if(!this.coursesTaught.contains(course)){
+            coursesTaught.add(course);
             course.setUser(this);
         }
     }
@@ -128,6 +157,40 @@ public class User {
     public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
         authorities.forEach(authority -> authority.setUser(this));
+    }
+
+    public List<Rating> getRatings() {
+        return ratings;
+    }
+
+    public void addRating(Rating rating) {
+        this.ratings.add(rating);
+        rating.setUser(this);
+    }
+
+    public String getAvatar() {
+        return Avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        Avatar = avatar;
+    }
+
+    public Set<Cart> getCarts() {
+        return carts;
+    }
+
+    public void addCartToUser(Cart cart) {
+        this.carts.add(cart);
+    }
+
+    public Set<Progress> getProgresses() {
+        return progresses;
+    }
+
+    public void addProgress (Progress progress) {
+        this.progresses.add(progress);
+        progress.setUser(this);
     }
 }
 
