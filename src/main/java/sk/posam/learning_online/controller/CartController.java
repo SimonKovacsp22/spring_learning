@@ -1,0 +1,59 @@
+package sk.posam.learning_online.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import sk.posam.learning_online.application.Impl.CartRepositoryImpl;
+import sk.posam.learning_online.controller.dto.CartRequest;
+import sk.posam.learning_online.domain.Cart;
+import sk.posam.learning_online.exceptions.UserNotFoundException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/cart")
+public class CartController {
+
+    @Autowired
+    CartRepositoryImpl cartRepository;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCartById(@PathVariable Long id) {
+        try {
+            Cart cart = cartRepository.getActiveCart(id);
+            return ResponseEntity.ok(cart);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<Map<String,Object>> addToCart(@RequestBody CartRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            cartRepository.addCourseToCart(request.getCourseId(),request.getUserId());
+            response.put("message", "Course added to cart successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("error", "Failed to add course to cart");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PostMapping("/remove")
+    public ResponseEntity<Map<String,Object>> removeFromCart(@RequestBody CartRequest request) {
+        Map<String,Object> response = new HashMap<>();
+        try {
+            cartRepository.removeCourseFromCart(request.getCourseId(),request.getUserId());
+            response.put("message", "Course removed successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("error", "Failed to remove course from cart");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+}

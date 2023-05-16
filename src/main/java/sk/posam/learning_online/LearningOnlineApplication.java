@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import sk.posam.learning_online.application.CategoryCrudRepository;
 import sk.posam.learning_online.application.CourseCrudRepository;
+import sk.posam.learning_online.application.LanguageCrudRepository;
 import sk.posam.learning_online.application.UserCrudRepository;
 
 @SpringBootApplication
@@ -17,7 +18,8 @@ public class LearningOnlineApplication {
 
 	}
 	@Bean
-	CommandLineRunner commandLineRunner(UserCrudRepository userCrudRepository, CategoryCrudRepository categoryCrudRepository, CourseCrudRepository courseCrudRepository) {
+	CommandLineRunner commandLineRunner(UserCrudRepository userCrudRepository, CategoryCrudRepository categoryCrudRepository,
+										CourseCrudRepository courseCrudRepository, LanguageCrudRepository languageCrudRepository) {
 
 
 
@@ -35,11 +37,19 @@ public class LearningOnlineApplication {
 //			 javaUpdated.addCategory(it);
 //
 //				courseCrudRepository.save(javaUpdated);
+
+//			List<Course> courses = courseCrudRepository.findByCategoryId(1L);
+//			System.out.println(courses.get(0).toString());
 //			}
+//			List<Language> languages = new ArrayList<>();
+//			Language english = new Language(LanguageName.ENGLISH);
+//			languageCrudRepository.saveAll(languages);
 
-
-
-
+//			User student = userCrudRepository.findById(1302L).orElse(null);
+//			if(student != null) {
+//				List<Course> courses = userCrudRepository.findCoursesByStudent(student);
+//				System.out.println(courses);
+//			}
 
 
 		};

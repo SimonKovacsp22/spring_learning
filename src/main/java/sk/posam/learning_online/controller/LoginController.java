@@ -45,11 +45,13 @@ public class LoginController {
             if (savedUser.getId() > 0) {
                 response = ResponseEntity
                         .status(HttpStatus.CREATED)
-                        .body("Given user details are successfully registered");
+                        .body(savedUser);
             } else {
                 response = ResponseEntity
                         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Failed to register user due to an unknown error");
+                        .body("Failed to register user due to an unknown error")
+
+                ;
             }
         }
         catch (DataIntegrityViolationException e) {

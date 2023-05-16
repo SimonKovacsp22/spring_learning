@@ -1,5 +1,6 @@
 package sk.posam.learning_online.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -12,7 +13,7 @@ public class Category {
     @Column(name="category_id")
     private Long id;
     private String name;
-
+    @JsonIgnore
     @ManyToMany(mappedBy = "categories",fetch = FetchType.EAGER)
     private Set<Course> courses = new HashSet<>();
 
