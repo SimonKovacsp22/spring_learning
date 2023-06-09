@@ -1,4 +1,4 @@
-package sk.posam.learning_online.coverter;
+package sk.posam.learning_online.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

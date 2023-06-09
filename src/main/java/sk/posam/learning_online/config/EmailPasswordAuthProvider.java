@@ -31,10 +31,10 @@ public class EmailPasswordAuthProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         String pwd = authentication.getCredentials().toString();
-        List<User> users = userCrudRepository.findByEmail(username);
-        if (users.size() > 0) {
-            if (passwordEncoder.matches(pwd, users.get(0).getPwd())) {
-                return new UsernamePasswordAuthenticationToken(username, pwd, getGrantedAuthorities(users.get(0).getAuthorities()));
+        User user = userCrudRepository.findByEmail(username).orElse(null);
+        if (user != null) {
+            if (passwordEncoder.matches(pwd, user.getPwd())) {
+                return new UsernamePasswordAuthenticationToken(username, pwd, getGrantedAuthorities(user.getAuthorities()));
             } else {
                 throw new BadCredentialsException("Invalid credentials!");
             }

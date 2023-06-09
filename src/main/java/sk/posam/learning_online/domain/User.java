@@ -2,8 +2,10 @@ package sk.posam.learning_online.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
+import sk.posam.learning_online.domain.views.views;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 @Entity
+@JsonView(views.Public.class)
 @Table(name = "\"user\"", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
 public class User {
     @Id
@@ -55,7 +58,11 @@ public class User {
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Progress> progresses;
+    private Set<Progress> progresses = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Order> orders = new HashSet<>();
 
     public User() {
     }
@@ -191,6 +198,21 @@ public class User {
     public void addProgress (Progress progress) {
         this.progresses.add(progress);
         progress.setUser(this);
+    }
+
+    public Set<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(Set<Order> orders) {
+        this.orders = orders;
+    }
+
+    public void addOrder(Order order) {
+        if(order != null) {
+            this.orders.add(order);
+            order.setUser(this);
+        }
     }
 }
 

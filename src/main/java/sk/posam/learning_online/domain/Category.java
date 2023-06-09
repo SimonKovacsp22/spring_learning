@@ -1,12 +1,15 @@
 package sk.posam.learning_online.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
+import sk.posam.learning_online.domain.views.views;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@JsonView(views.Public.class)
 public class Category {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO,generator="native")

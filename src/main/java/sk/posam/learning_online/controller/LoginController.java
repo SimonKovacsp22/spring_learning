@@ -16,7 +16,6 @@ import sk.posam.learning_online.domain.User;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -68,9 +67,9 @@ public class LoginController {
 
     @RequestMapping("/user")
     public User getUserDetailsAfterLogin(Authentication authentication) {
-        List<User> users = userCrudRepository.findByEmail(authentication.getName());
-        if (users.size() > 0) {
-            return users.get(0);
+        User user = userCrudRepository.findByEmail(authentication.getName()).orElse(null);
+        if (user != null) {
+            return user;
         } else {
             return null;
         }

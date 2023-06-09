@@ -1,4 +1,4 @@
-package sk.posam.learning_online.domain.repositories;
+package sk.posam.learning_online.domain.services;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;

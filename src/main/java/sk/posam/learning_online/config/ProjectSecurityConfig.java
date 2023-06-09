@@ -14,7 +14,11 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import sk.posam.learning_online.filter.*;
+import sk.posam.learning_online.application.UserCrudRepository;
+import sk.posam.learning_online.filter.CsrfCookieFilter;
+import sk.posam.learning_online.filter.JWTGenerationFilter;
+import sk.posam.learning_online.filter.JWTValidationFilter;
+import sk.posam.learning_online.filter.RequestValidationBeforeFilter;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,32 +29,50 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @Configuration
 public class ProjectSecurityConfig {
 
+    private final UserCrudRepository userCrudRepository;
+
+    public ProjectSecurityConfig(UserCrudRepository userCrudRepository) {
+        this.userCrudRepository = userCrudRepository;
+    }
+
+    @Bean
+    public JWTGenerationFilter jwtGenerationFilter() {
+        return new JWTGenerationFilter(userCrudRepository);
+    }
+
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .cors().configurationSource(corsConfigurationSource())
-//
+
                 .and().csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers(
-                        "/categories","/register","/courses","/cart","/cart/add","/cart/remove","/courses/my")
+                        "/categories","/register","/courses","/cart","/cart/add","/cart/remove","/courses/my",
+                                "courses/my/course","/checkout","/checkout/purchase","courses/teach","courses/draft","courses/update/**",
+                                "/courses/teach/course/**","/courses/languages")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
-//                .addFilterAt(new AuthoritiesLoggingAtFilter(),BasicAuthenticationFilter.class)
-//                .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new JWTGenerationFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(jwtGenerationFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JWTValidationFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests()
-                .requestMatchers("/myBalance").hasAnyRole("USER","ADMIN")
                 .requestMatchers(antMatcher(HttpMethod.POST, "/cart/add")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.POST, "/cart/remove")).hasRole("USER")
+                .requestMatchers(antMatcher(HttpMethod.PUT, "/courses/update/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET,"/cart/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.GET,"/courses/my/**")).hasRole("USER")
+                .requestMatchers(antMatcher(HttpMethod.GET,"/courses/my/course/**")).hasRole("USER")
+                .requestMatchers(antMatcher(HttpMethod.GET,"/courses/teach")).hasRole("USER")
+                .requestMatchers(antMatcher(HttpMethod.GET,"/courses/teach/course/**")).hasRole("USER")
                 .requestMatchers("/user").authenticated()
-                .requestMatchers("/contact","/register").permitAll()
+                .requestMatchers("/register").permitAll()
+                .requestMatchers(antMatcher(HttpMethod.POST,"/courses/draft")).hasRole("USER")
+                .requestMatchers(antMatcher(HttpMethod.GET,"/courses/languages")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET,"/categories/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET,"/courses/**")).permitAll()
+                .requestMatchers(antMatcher(HttpMethod.POST,"/checkout/purchase")).permitAll()
+                .requestMatchers(antMatcher(HttpMethod.POST,"/checkout")).permitAll()
                 .and().formLogin()
                 .and().httpBasic();
         return http.build();

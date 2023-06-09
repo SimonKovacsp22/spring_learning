@@ -12,7 +12,7 @@ import sk.posam.learning_online.application.UserCrudRepository;
 import sk.posam.learning_online.constants.SecurityConstants;
 import sk.posam.learning_online.domain.Course;
 import sk.posam.learning_online.domain.User;
-import sk.posam.learning_online.domain.repositories.UserRepository;
+import sk.posam.learning_online.domain.services.UserService;
 import sk.posam.learning_online.exceptions.UserNotFoundException;
 
 import javax.crypto.SecretKey;
@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 @Service
 @Transactional
-public class UserRepositoryImpl implements UserRepository {
+public class UserServiceImpl implements UserService {
     @Autowired
     UserCrudRepository userCrudRepository;
 
@@ -61,6 +61,24 @@ public class UserRepositoryImpl implements UserRepository {
                     .getBody();
             String email = String.valueOf(claims.get("username"));
             return email;
+        } else  return null;
+    }
+
+    @Override
+    public Long getIdFromAuthorizationHeader(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        String jwtToken = null;
+        if (authorizationHeader != null) {
+            jwtToken = authorizationHeader.substring(0); // Remove "Bearer " prefix but in our app it's not there
+            SecretKey key = Keys.hmacShaKeyFor(
+                    SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(jwtToken)
+                    .getBody();
+            Long userId = Long.parseLong(String.valueOf(claims.get("id")));
+            return userId;
         } else  return null;
     }
 

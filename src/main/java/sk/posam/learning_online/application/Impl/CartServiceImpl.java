@@ -9,11 +9,11 @@ import sk.posam.learning_online.application.UserCrudRepository;
 import sk.posam.learning_online.domain.Cart;
 import sk.posam.learning_online.domain.Course;
 import sk.posam.learning_online.domain.User;
-import sk.posam.learning_online.domain.repositories.CartRepository;
+import sk.posam.learning_online.domain.services.CartService;
 import sk.posam.learning_online.exceptions.UserNotFoundException;
 @Service
 @Transactional
-public class CartRepositoryImpl implements CartRepository {
+public class CartServiceImpl implements CartService {
     @Autowired
     CartCrudRepository cartCrudRepository;
 

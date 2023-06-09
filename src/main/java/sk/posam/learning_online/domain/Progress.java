@@ -1,9 +1,13 @@
 package sk.posam.learning_online.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
+import sk.posam.learning_online.domain.views.views;
+
 @Entity
+@JsonView(views.Public.class)
 public class Progress {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO,generator="native")
