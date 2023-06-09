@@ -7,4 +7,6 @@ import java.util.Collection;
 public interface CourseRepository {
     Collection<Course> getAllCoursesForCategory(Long categoryId);
 
+
+
 }
