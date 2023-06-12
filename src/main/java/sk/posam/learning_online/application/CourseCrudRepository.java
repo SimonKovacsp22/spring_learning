@@ -1,7 +1,9 @@
 package sk.posam.learning_online.application;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import sk.posam.learning_online.domain.Course;
 
@@ -9,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CourseCrudRepository extends CrudRepository<Course,Long> {
+public interface CourseCrudRepository extends JpaRepository<Course,Long> {
     @Query("SELECT c FROM Course c JOIN c.categories cat WHERE cat.id = ?1 AND c.draft = false")
     List<Course> findByCategoryId(Long categoryId);
 
@@ -20,4 +22,7 @@ public interface CourseCrudRepository extends CrudRepository<Course,Long> {
     Optional<Course> findCourseByTeacherIdAndCourseId(Long userId, Long courseId);
 
     List<Course> findAllByUserId(Long userId);
+
+    Page<Course> findByTitleIgnoreCaseContainingAndDraftIsFalse(String title, Pageable pageable);
+
 }

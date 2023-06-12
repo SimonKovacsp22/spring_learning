@@ -2,16 +2,22 @@ package sk.posam.learning_online.application.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sk.posam.learning_online.application.CategoryCrudRepository;
 import sk.posam.learning_online.application.CourseCrudRepository;
 import sk.posam.learning_online.application.UserCrudRepository;
+import sk.posam.learning_online.application.WhatYouWillLearnCrudRepository;
 import sk.posam.learning_online.domain.Category;
 import sk.posam.learning_online.domain.Course;
 import sk.posam.learning_online.domain.User;
+import sk.posam.learning_online.domain.WhatYouWillLearn;
 import sk.posam.learning_online.domain.services.CourseService;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,6 +32,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     UserCrudRepository userCrudRepository;
+    @Autowired
+    WhatYouWillLearnCrudRepository whatYouWillLearnCrudRepository;
 
 
     @Override
@@ -41,6 +49,7 @@ public class CourseServiceImpl implements CourseService {
         newCourse.setUser(user);
         newCourse.addCategory(category);
         newCourse.setDraft(true);
+        newCourse.setCreatedAt(LocalDateTime.now());
         return courseCrudRepository.save(newCourse);
     }
 
@@ -50,10 +59,65 @@ public class CourseServiceImpl implements CourseService {
       return course;
     }
 
+    @Override
+    public Course updateCourse(Course course, String title, String subtitle, String description, String imgUrl)  {
+        if(course == null) {
+            return null;
+        }
+        if(title != null && title.length() >= 15) {
+            course.setTitle(title);
+        }
+        if(subtitle != null && !subtitle.equals("")) {
+            course.setSubtitle(subtitle);
+        }
+        if(description != null && !description.equals("")) {
+            course.setDescription(description);
+        }
+        if(imgUrl != null) {
+            course.setImageUrl(imgUrl);
+        }
+
+       return courseCrudRepository.save(course);
+    }
+
+    @Override
+    public Course updateCoursePrice(Course course, Double price) {
+        if(course == null || price == null) {
+            return null;
+        } else {
+            course.setPrice(price);
+        }
+        return courseCrudRepository.save(course);
+    }
+
+    @Override
+    public Course updateCourseWhatYouWillLearn(Course course, ArrayList<String> sentences) {
+        if(course == null || sentences == null) {
+            return null;
+        } else {
+            List<WhatYouWillLearn> oldSentences = whatYouWillLearnCrudRepository.findByCourseId(course.getId());
+            Iterable<WhatYouWillLearn> iterable = new ArrayList<>(oldSentences);
+            whatYouWillLearnCrudRepository.deleteAll(iterable);
+            for (String sentence: sentences
+                 ) {
+                if(sentence.equals("")) {
+                    continue;
+                }
+                WhatYouWillLearn whatYouWillLearn = new WhatYouWillLearn(sentence);
+                course.addWYWL(whatYouWillLearn);
+            }
+
+        }
+        return courseCrudRepository.save(course);
+    }
 
 
     public List<Course> getAllCoursesForTeacher(Long userId) {
         return courseCrudRepository.findAllByUserId(userId);
+    }
+
+    public Page<Course> searchCoursesByTitle(String searchTerm, Pageable pageable) {
+        return courseCrudRepository.findByTitleIgnoreCaseContainingAndDraftIsFalse(searchTerm, pageable);
     }
 
 

@@ -26,6 +26,8 @@ public class Course {
 
     private Double price;
 
+    private String currency;
+
     @Column(name = "last_update")
     private LocalDateTime lastUpdated;
 
@@ -36,6 +38,8 @@ public class Course {
 
     private String imageUrl;
     private boolean draft;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
 
     @ManyToMany( cascade = CascadeType.ALL)
@@ -257,6 +261,25 @@ public class Course {
         progress.setCourse(this);
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public void setWhatYouWillLearn(List<WhatYouWillLearn> whatYouWillLearn) {
+        this.whatYouWillLearn = whatYouWillLearn;
+    }
 
     @Override
     public String toString() {

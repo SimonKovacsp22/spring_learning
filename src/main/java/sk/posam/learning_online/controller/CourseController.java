@@ -5,6 +5,9 @@ import com.cloudinary.utils.ObjectUtils;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +17,10 @@ import sk.posam.learning_online.application.Impl.CourseServiceImpl;
 import sk.posam.learning_online.application.Impl.LanguageServiceImpl;
 import sk.posam.learning_online.application.Impl.UserServiceImpl;
 import sk.posam.learning_online.application.UserCrudRepository;
+import sk.posam.learning_online.application.WhatYouWillLearnCrudRepository;
 import sk.posam.learning_online.controller.dto.CourseRequest;
+import sk.posam.learning_online.controller.dto.PriceUpdateRequest;
+import sk.posam.learning_online.controller.dto.WYWLUpdateRequest;
 import sk.posam.learning_online.domain.Course;
 import sk.posam.learning_online.domain.User;
 import sk.posam.learning_online.domain.views.views;
@@ -46,16 +52,19 @@ public class CourseController {
     CourseCrudRepository courseCrudRepository;
 
     @Autowired
-    CourseServiceImpl courseRepositoryImpl;
+    CourseServiceImpl courseServiceImpl;
 
     @Autowired
     UserCrudRepository userCrudRepository;
 
     @Autowired
-    UserServiceImpl userRepositoryImpl;
+    UserServiceImpl userServiceImpl;
 
     @Autowired
     LanguageServiceImpl languageServiceImpl;
+
+    @Autowired
+    WhatYouWillLearnCrudRepository whatYouWillLearnCrudRepository;
 
     @GetMapping("/{id}")
     @JsonView(views.Public.class)
@@ -73,7 +82,7 @@ public class CourseController {
     @JsonView(views.VideosWithUrl.class)
     public ResponseEntity<Map<String,Object>> getMyCourseById(HttpServletRequest request,@PathVariable Long id) {
         Map<String,Object> response = new HashMap<>();
-            String email = userRepositoryImpl.getEmailFromAuthorizationHeader(request);
+            String email = userServiceImpl.getEmailFromAuthorizationHeader(request);
             if(email == null){
                 response.put("message", "Token is not present or expired.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
@@ -87,7 +96,7 @@ public class CourseController {
             LOG.info(String.valueOf(user.getId()));
 
             try {
-                response.put("course", userRepositoryImpl.getMyCourseById(user.getId(),id));
+                response.put("course", userServiceImpl.getMyCourseById(user.getId(),id));
                 return ResponseEntity.ok(response);
             } catch (Exception e) {
                 response.put("message", e.getMessage());
@@ -102,7 +111,7 @@ public class CourseController {
     public ResponseEntity<Map<String,Object>> getMyCourses(HttpServletRequest request) {
 
         Map<String,Object> response = new HashMap<>();
-        String email = userRepositoryImpl.getEmailFromAuthorizationHeader(request);
+        String email = userServiceImpl.getEmailFromAuthorizationHeader(request);
         if(email == null){
             response.put("message", "Token is not present or expired.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
@@ -113,7 +122,7 @@ public class CourseController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         try {
-            response.put("courses", userRepositoryImpl.getMyCourses(user.getId()));
+            response.put("courses", userServiceImpl.getMyCourses(user.getId()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("message", e.getMessage());
@@ -125,7 +134,7 @@ public class CourseController {
     @JsonView(views.VideosWithUrl.class)
     public ResponseEntity<Map<String,Object>> getTeacherCourses(HttpServletRequest request) {
         Map<String,Object> response = new HashMap<>();
-        String email = userRepositoryImpl.getEmailFromAuthorizationHeader(request);
+        String email = userServiceImpl.getEmailFromAuthorizationHeader(request);
         if(email == null){
             response.put("message", "Token is not present or expired.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
@@ -137,7 +146,7 @@ public class CourseController {
         }
 
         try {
-            response.put("courses", courseRepositoryImpl.getAllCoursesForTeacher(user.getId()));
+            response.put("courses", courseServiceImpl.getAllCoursesForTeacher(user.getId()));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("message", e.getMessage());
@@ -149,7 +158,7 @@ public class CourseController {
     @JsonView(views.VideosWithUrl.class)
     public ResponseEntity<Map<String,Object>> getCourseForTeacher(HttpServletRequest request,@PathVariable Long id) {
         Map<String,Object> response = new HashMap<>();
-        Long userId = userRepositoryImpl.getIdFromAuthorizationHeader(request);
+        Long userId = userServiceImpl.getIdFromAuthorizationHeader(request);
         if(userId == null){
             response.put("message", "Token is not present or expired.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
@@ -161,7 +170,7 @@ public class CourseController {
         }
 
         try {
-            response.put("course", courseRepositoryImpl.getCourseForTeacher(user.getId(),id));
+            response.put("course", courseServiceImpl.getCourseForTeacher(user.getId(),id));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("message", e.getMessage());
@@ -181,18 +190,31 @@ public class CourseController {
         }
     }
 
+    @GetMapping("/search")
+//    @JsonView(views.Public.class)
+    public ResponseEntity<Map<String,Object>> getCoursesBySearch
+            (@RequestParam("title") String searchTerm,
+             @RequestParam(value = "page", defaultValue ="0" ) int pageNumber,
+             @RequestParam(value = "size", defaultValue ="10" ) int pageSize) {
+        Map<String,Object> response = new HashMap<>();
+        Pageable pageable = PageRequest.of(pageNumber,pageSize);
+        Page<Course> coursesPage = courseServiceImpl.searchCoursesByTitle(searchTerm,pageable);
+        response.put("courses",coursesPage);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/draft")
     @JsonView(views.VideosWithUrl.class)
     public ResponseEntity<Map<String,Object>> createCourse(@RequestBody CourseRequest courseRequest,HttpServletRequest request) {
         Map<String,Object> response = new HashMap<>();
-        Long userId = userRepositoryImpl.getIdFromAuthorizationHeader(request);
+        Long userId = userServiceImpl.getIdFromAuthorizationHeader(request);
         LOG.info("userId: " + userId);
         if(userId == null) {
             response.put("message", "Token is not present or expired.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         try {
-            response.put("course", courseRepositoryImpl.createCourseOnClient(courseRequest.getTitle(),courseRequest.getCategoryId(),userId));
+            response.put("course", courseServiceImpl.createCourseOnClient(courseRequest.getTitle(),courseRequest.getCategoryId(),userId));
             return ResponseEntity.ok(response);
         }catch (Exception e){
             response.put("message", e.getMessage());
@@ -202,22 +224,118 @@ public class CourseController {
 
 
 
-    @PutMapping(value="/update/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<Map<String,Object>> UpdateCOurse(@RequestParam("file")MultipartFile file, HttpServletRequest request) throws IOException {
+//    @PutMapping(value="/update/{id}", consumes = "multipart/form-data")
+//    public ResponseEntity<Map<String,Object>> UpdateCOurse(@RequestParam("file")MultipartFile file, HttpServletRequest request) throws IOException {
+//        Map<String,Object> response = new HashMap<>();
+//
+//        try{
+//
+//            Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "video"));
+//
+//            response.put("message", "File uploaded successfully");
+//            response.put("url",uploadedFile.get("secure_url") );
+//        } catch(Exception e) {
+//            System.out.println(e);
+//
+//        }
+//        return ResponseEntity.ok(response);
+//    }
+
+    @PutMapping(value="/update/basic/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<Map<String,Object>> UpdateCourseLandingPage(
+            @RequestParam(name = "file",required = false) MultipartFile file,
+            @PathVariable Long id,
+            @RequestParam("title") String title,
+            @RequestParam("subtitle") String subtitle,
+            @RequestParam("description") String description,
+            HttpServletRequest request) throws IOException {
         Map<String,Object> response = new HashMap<>();
+        Course course = courseCrudRepository.findById(id).orElse(null);
+        if(course != null) {
+            Long userId = userServiceImpl.getIdFromAuthorizationHeader(request);
+            if(userId == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            User user = userCrudRepository.findById(userId).orElse(null);
+            if(user == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            if(!course.getUser().equals(user)) {
+                response.put("message", "This user does not have permission to update this course.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
 
-        try{
+            String imgUrl = null;
 
-            Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "video"));
+            if(file != null) {
+                Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
+                imgUrl = (String) uploadedFile.get("secure_url");
 
-        response.put("message", "File uploaded successfully");
-        response.put("url",uploadedFile.get("secure_url") );
-        } catch(Exception e) {
-            System.out.println(e);
+            }
+            Course updatedCourse = courseServiceImpl.updateCourse(course,title,subtitle,description,imgUrl);
+            if(updatedCourse == null) {
+                response.put("message", "Internal serve errror");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
+            response.put("course", updatedCourse);
+
 
         }
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/update/price/{id}")
+    public ResponseEntity<Map<String,Object>> UpdateCoursePrice(@PathVariable Long id, @RequestBody PriceUpdateRequest priceUpdateRequest, HttpServletRequest request){
+        Map<String,Object> response = new HashMap<>();
+        Course course = courseCrudRepository.findById(id).orElse(null);
+        LOG.info("here");
+        if(course != null) {
+            Long userId = userServiceImpl.getIdFromAuthorizationHeader(request);
+            if(userId == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            User user = userCrudRepository.findById(userId).orElse(null);
+            if(user == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            if(!course.getUser().equals(user)) {
+                response.put("message", "This user does not have permission to update this course.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            Course updatedCourse = courseServiceImpl.updateCoursePrice(course,priceUpdateRequest.getPrice());
+            response.put("course",updatedCourse);
 
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/update/learning/{id}")
+    public ResponseEntity<Map<String,Object>> UpdateCoursePrice(@PathVariable Long id, @RequestBody WYWLUpdateRequest wywlUpdateRequest, HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        Course course = courseCrudRepository.findById(id).orElse(null);
+        if(course != null) {
+            Long userId = userServiceImpl.getIdFromAuthorizationHeader(request);
+            if(userId == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            User user = userCrudRepository.findById(userId).orElse(null);
+            if(user == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            if(!course.getUser().equals(user)) {
+                response.put("message", "This user does not have permission to update this course.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            Course updatedCourse = courseServiceImpl.updateCourseWhatYouWillLearn(course,wywlUpdateRequest.getSentences());
+            response.put("course",updatedCourse);
+        }
+
+        return ResponseEntity.ok(response);
+    }
 }
