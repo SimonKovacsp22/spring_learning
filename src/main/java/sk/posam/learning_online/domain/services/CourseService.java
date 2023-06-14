@@ -19,6 +19,10 @@ public interface CourseService {
 
     Course updateCourseWhatYouWillLearn(Course course, ArrayList<String> sentences);
 
+    Course addOrUpdateSection(Course course,String title, Long sectionId,Integer rank);
+
+    Course removeSection(Course course,Long sectionId);
+
 
 
 

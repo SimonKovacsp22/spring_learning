@@ -33,6 +33,12 @@ public class Section {
     private Set<Video> videos = new HashSet<>();
 
 
+    public Section(String title) {
+        this.title = title;
+    }
+
+    public Section() {
+    }
 
     public long getId() {
         return id;
@@ -49,6 +55,8 @@ public class Section {
     public void setCourse(Course course) {
         this.course = course;
     }
+
+
 
     public String getTitle() {
         return title;

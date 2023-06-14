@@ -222,6 +222,11 @@ public class Course {
         this.sections.add(section);
         section.setCourse(this);
     }
+    public void removeSection (Section section) {
+        this.sections.remove(section);
+        section.setCourse(null);
+
+    }
 
     public String getSubtitle() {
         return subtitle;

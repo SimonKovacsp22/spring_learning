@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import sk.posam.learning_online.domain.Course;
+import sk.posam.learning_online.domain.Section;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,5 +25,8 @@ public interface CourseCrudRepository extends JpaRepository<Course,Long> {
     List<Course> findAllByUserId(Long userId);
 
     Page<Course> findByTitleIgnoreCaseContainingAndDraftIsFalse(String title, Pageable pageable);
+
+    @Query("SELECT s FROM Section s WHERE s.course.id =:courseId AND s.id = :sectionId")
+    Optional<Section> findSectionByCourseAndId();
 
 }

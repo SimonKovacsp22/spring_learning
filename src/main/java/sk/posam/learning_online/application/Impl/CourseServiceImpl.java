@@ -6,14 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sk.posam.learning_online.application.CategoryCrudRepository;
-import sk.posam.learning_online.application.CourseCrudRepository;
-import sk.posam.learning_online.application.UserCrudRepository;
-import sk.posam.learning_online.application.WhatYouWillLearnCrudRepository;
-import sk.posam.learning_online.domain.Category;
-import sk.posam.learning_online.domain.Course;
-import sk.posam.learning_online.domain.User;
-import sk.posam.learning_online.domain.WhatYouWillLearn;
+import sk.posam.learning_online.application.*;
+import sk.posam.learning_online.domain.*;
 import sk.posam.learning_online.domain.services.CourseService;
 
 import java.time.LocalDateTime;
@@ -34,7 +28,8 @@ public class CourseServiceImpl implements CourseService {
     UserCrudRepository userCrudRepository;
     @Autowired
     WhatYouWillLearnCrudRepository whatYouWillLearnCrudRepository;
-
+    @Autowired
+    SectionCrudRepository sectionCrudRepository;
 
     @Override
     public Collection<Course> getAllCoursesForCategory(Long categoryId) {
@@ -107,6 +102,47 @@ public class CourseServiceImpl implements CourseService {
                 course.addWYWL(whatYouWillLearn);
             }
 
+        }
+        return courseCrudRepository.save(course);
+    }
+
+    @Override
+    public Course addOrUpdateSection(Course course, String title, Long sectionId,Integer rank) {
+        if(course == null ) {
+            return null;
+        }
+        Section section = null;
+        if((sectionId != null)) {
+//            Looking for section
+            section = sectionCrudRepository.findById(sectionId).orElse(null);
+        }
+        if (
+           section == null
+        ) {
+//            Section is not found thus creating new one
+            Section newSection = new Section(title);
+            if(rank != null) {
+                newSection.setRank(rank);
+            }
+            course.addSection(newSection);
+        } else {
+            //            Section is found thus updating it
+            section.setTitle(title);
+            if (rank != null) {
+            section.setRank(rank);
+            }
+        }
+        return courseCrudRepository.save(course);
+    }
+
+    @Override
+    public Course removeSection(Course course, Long sectionId) {
+        Section section = sectionCrudRepository.findById(sectionId).orElse(null);
+        if(course == null || section == null) {
+            return null;
+        }else {
+            course.removeSection(section);
+//            sectionCrudRepository.delete(section);
         }
         return courseCrudRepository.save(course);
     }

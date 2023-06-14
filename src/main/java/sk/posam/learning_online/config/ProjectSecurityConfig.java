@@ -51,7 +51,7 @@ public class ProjectSecurityConfig {
                         "/categories","/register","/courses","/cart","/cart/add","/cart/remove","/courses/my",
                                 "/courses/my/course","/checkout","/checkout/purchase","/courses/teach","/courses/draft","/courses/update/basic/**",
                                 "/courses/teach/course/**","/courses/languages","/courses/search", "/courses/update/price/**",
-                                "/courses/update/learning/**")
+                                "/courses/update/learning/**","/courses/update/curriculum/sections/**")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
@@ -60,8 +60,9 @@ public class ProjectSecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(antMatcher(HttpMethod.POST, "/cart/add")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.POST, "/cart/remove")).hasRole("USER")
-                .requestMatchers(antMatcher(HttpMethod.GET,"/cart/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.POST,"/courses/draft")).hasRole("USER")
+                .requestMatchers(antMatcher(HttpMethod.POST,"/courses/update/curriculum/sections/**")).hasRole("USER")
+                .requestMatchers(antMatcher(HttpMethod.GET,"/cart/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.PUT, "/courses/update/basic/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.PUT, "/courses/update/price/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.PUT,"/courses/update/learning/**")).permitAll()
@@ -72,11 +73,11 @@ public class ProjectSecurityConfig {
                 .requestMatchers("/user").authenticated()
                 .requestMatchers("/register").permitAll()
                 .requestMatchers(antMatcher(HttpMethod.POST,"/courses/search")).permitAll()
+                .requestMatchers(antMatcher(HttpMethod.POST,"/checkout/purchase")).permitAll()
+                .requestMatchers(antMatcher(HttpMethod.POST,"/checkout")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET,"/courses/languages")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET,"/categories/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET,"/courses/**")).permitAll()
-                .requestMatchers(antMatcher(HttpMethod.POST,"/checkout/purchase")).permitAll()
-                .requestMatchers(antMatcher(HttpMethod.POST,"/checkout")).permitAll()
                 .and().formLogin()
                 .and().httpBasic();
         return http.build();
