@@ -1,8 +1,10 @@
 package sk.posam.learning_online.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
+import sk.posam.learning_online.domain.views.views;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -11,7 +13,9 @@ import java.util.Set;
 
 @Entity
 @Table
+@JsonView(views.Public.class)
 public class Course {
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO,generator="native")
     @GenericGenerator(name = "native",strategy = "native")
@@ -22,17 +26,23 @@ public class Course {
 
     private Double price;
 
+    private String currency;
+
     @Column(name = "last_update")
     private LocalDateTime lastUpdated;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
     private String subtitle;
 
     private String imageUrl;
+    private boolean draft;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @ManyToMany( cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER)
+
+    @ManyToMany( cascade = CascadeType.ALL)
     @JoinTable(name="course_students",
             joinColumns = @JoinColumn(name = "course_id"),
             inverseJoinColumns = @JoinColumn(name ="user_id"))
@@ -49,8 +59,7 @@ public class Course {
     )
     private User user;
 
-    @ManyToMany( cascade = CascadeType.ALL,
-                    fetch = FetchType.EAGER)
+    @ManyToMany( cascade = CascadeType.ALL)
     @JoinTable(name="course_category",
     joinColumns = @JoinColumn(name = "course_id"),
     inverseJoinColumns = @JoinColumn(name ="category_id"))
@@ -60,18 +69,20 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<WhatYouWillLearn> whatYouWillLearn;
 
-    @ManyToMany( cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<WhoIsCourseFor> whoIsCourseFor;
+
+    @ManyToMany( cascade = CascadeType.ALL)
     @JoinTable(name="course_languages",
             joinColumns = @JoinColumn(name = "course_id"),
             inverseJoinColumns = @JoinColumn(name ="language_id"))
     private Set<Language> languages = new HashSet<>();
 
-    @OneToMany(mappedBy="course",fetch= FetchType.EAGER,cascade = CascadeType.ALL)
-    private Set<Video> videos = new HashSet<>();;
+    @OneToMany(mappedBy="course",cascade = CascadeType.ALL)
+    private Set<Section> sections = new HashSet<>();
 
-    @OneToMany(mappedBy = "course",fetch= FetchType.EAGER,cascade = CascadeType.ALL)
-    private Set<Rating> ratings = new HashSet<>();;
+    @OneToMany(mappedBy = "course",cascade = CascadeType.ALL)
+    private Set<Rating> ratings = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name="course_cart",
@@ -81,7 +92,7 @@ public class Course {
     private Set<Cart> carts = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "course",fetch= FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course",cascade = CascadeType.ALL)
     private Set<Progress> progresses = new HashSet<>();
 
 
@@ -89,9 +100,16 @@ public class Course {
     public Course() {
     }
 
-    public Course(String title, String description) {
+    public Course(String title) {
         this.title = title;
-        this.description = description;
+    }
+
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
     }
 
     public Double getPrice() {
@@ -178,6 +196,15 @@ public class Course {
         whatYouWillLearn.setCourse(this);
     }
 
+    public List<WhoIsCourseFor> getWhoIsCourseFor() {
+        return whoIsCourseFor;
+    }
+
+    public void addWICF(WhoIsCourseFor whoIsCourseFor) {
+        this.whoIsCourseFor.add(whoIsCourseFor);
+        whoIsCourseFor.setCourse(this);
+    }
+
     public Set<Language> getLanguages() {
         return languages;
     }
@@ -187,13 +214,18 @@ public class Course {
         language.addCourse(this);
     }
 
-    public Set<Video> getVideos() {
-        return videos;
+    public Set<Section> getSections() {
+        return sections;
     }
 
-    public void addVideo(Video video) {
-        this.videos.add(video);
-        video.setCourse(this);
+    public void addSection(Section section) {
+        this.sections.add(section);
+        section.setCourse(this);
+    }
+    public void removeSection (Section section) {
+        this.sections.remove(section);
+        section.setCourse(null);
+
     }
 
     public String getSubtitle() {
@@ -234,6 +266,25 @@ public class Course {
         progress.setCourse(this);
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public void setWhatYouWillLearn(List<WhatYouWillLearn> whatYouWillLearn) {
+        this.whatYouWillLearn = whatYouWillLearn;
+    }
 
     @Override
     public String toString() {

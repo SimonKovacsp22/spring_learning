@@ -1,9 +1,9 @@
-package sk.posam.learning_online.domain.repositories;
+package sk.posam.learning_online.domain.services;
 
 import sk.posam.learning_online.domain.Cart;
 import sk.posam.learning_online.domain.User;
 
-public interface CartRepository {
+public interface CartService {
     Cart getActiveCart(Long userId);
 
     Cart createActiveCart(User user);

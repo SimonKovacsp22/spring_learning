@@ -1,27 +1,48 @@
 package sk.posam.learning_online.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
+import sk.posam.learning_online.domain.views.views;
 
 @Entity
-public class Video {
+@Table(name = "video")
+public class Lecture {
+    @JsonView(views.Public.class)
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO,generator="native")
     @GenericGenerator(name = "native",strategy = "native")
     @Column(name = "video_id")
     private long id;
-
+    @JsonView(views.Public.class)
     private String title;
-
+    @JsonView(views.Public.class)
     private String duration;
+    @JsonView(views.Public.class)
     @Column(name = "duration_seconds",
     nullable = true)
     private int durationInSeconds;
 
+    @JsonView(views.VideosWithUrl.class)
     private String sourceUrl;
-
+    @JsonView(views.Public.class)
     private int rank;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "section_id")
+    private Section section;
+
+    public Lecture(String title, int durationInSeconds, String sourceUrl, int rank) {
+        this.title = title;
+        this.durationInSeconds = durationInSeconds;
+        this.sourceUrl = sourceUrl;
+        this.rank = rank;
+    }
+
+    public Lecture() {
+    }
 
     public long getId() {
         return id;
@@ -63,12 +84,12 @@ public class Video {
         this.rank = rank;
     }
 
-    public Course getCourse() {
-        return course;
+    public Section getSection() {
+        return section;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
+    public void setSection(Section section) {
+        this.section = section;
     }
 
     public int getDurationInSeconds() {
@@ -79,8 +100,7 @@ public class Video {
         this.durationInSeconds = durationInSeconds;
     }
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
+
+
+
 }

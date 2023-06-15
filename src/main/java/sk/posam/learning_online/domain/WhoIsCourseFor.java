@@ -8,15 +8,15 @@ import sk.posam.learning_online.domain.views.views;
 
 @Entity
 @JsonView(views.Public.class)
-public class WhatYouWillLearn {
-
+public class WhoIsCourseFor {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO,generator="native")
     @GenericGenerator(name = "native",strategy = "native")
-    @Column(name = "wywl_id")
+    @Column(name = "wicf_id")
     private Long id;
 
-    String sentence;
+    private String targetedAudience;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(
@@ -24,17 +24,11 @@ public class WhatYouWillLearn {
             nullable = false,
             referencedColumnName = "course_id",
             foreignKey = @ForeignKey(
-                    name = "wywl_course_fk"
+                    name = "wicf_course_fk"
             )
     )
     private Course course;
 
-    public WhatYouWillLearn(String sentence) {
-        this.sentence = sentence;
-    }
-
-    public WhatYouWillLearn() {
-    }
 
     public Long getId() {
         return id;
@@ -44,12 +38,12 @@ public class WhatYouWillLearn {
         this.id = id;
     }
 
-    public String getSentence() {
-        return sentence;
+    public String getTargetedAudience() {
+        return targetedAudience;
     }
 
-    public void setSentence(String sentence) {
-        this.sentence = sentence;
+    public void setTargetedAudience(String targetedAudience) {
+        this.targetedAudience = targetedAudience;
     }
 
     public Course getCourse() {

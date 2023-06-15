@@ -36,11 +36,6 @@ public class RequestValidationBeforeFilter  implements Filter {
                     if (delim == -1) {
                         throw new BadCredentialsException("Invalid basic authentication token");
                     }
-                    String email = token.substring(0, delim);
-                    if (email.toLowerCase().contains("test")) {
-                        res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        return;
-                    }
                 } catch (IllegalArgumentException e) {
                     throw new BadCredentialsException("Failed to decode basic authentication token");
                 }

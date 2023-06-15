@@ -5,14 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sk.posam.learning_online.application.CategoryCrudRepository;
 import sk.posam.learning_online.domain.Category;
-import sk.posam.learning_online.domain.repositories.CategoryRepository;
+import sk.posam.learning_online.domain.services.CategoryService;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 @Service
 @Transactional
-public class CategoryRepositoryImpl implements CategoryRepository {
+public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     CategoryCrudRepository categoryCrudRepository;
