@@ -27,6 +27,6 @@ public interface CourseCrudRepository extends JpaRepository<Course,Long> {
     Page<Course> findByTitleIgnoreCaseContainingAndDraftIsFalse(String title, Pageable pageable);
 
     @Query("SELECT s FROM Section s WHERE s.course.id =:courseId AND s.id = :sectionId")
-    Optional<Section> findSectionByCourseAndId();
+    Optional<Section> findSectionByCourseAndId(Long sectionId,Long courseId);
 
 }

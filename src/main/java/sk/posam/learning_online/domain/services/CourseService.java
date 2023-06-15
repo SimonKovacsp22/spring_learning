@@ -24,7 +24,9 @@ public interface CourseService {
 
     Course removeSection(Course course,Long sectionId);
 
-    Section addOrUpdateLecture(Long sectionId, Long lectureId, String title,Integer durationInSeconds, Integer rank, String sourceUrl);
+    Section updateLecture(Section section, Long lectureId, String title,Integer durationInSeconds, Integer rank, String sourceUrl);
+
+    Section createLecture(Section section, String title, Integer durationInSeconds, Integer rank, String sourceUrl);
 
 
 

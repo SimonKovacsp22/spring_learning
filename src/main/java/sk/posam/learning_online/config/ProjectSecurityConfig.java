@@ -51,7 +51,8 @@ public class ProjectSecurityConfig {
                         "/categories","/register","/courses","/cart","/cart/add","/cart/remove","/courses/my",
                                 "/courses/my/course","/checkout","/checkout/purchase","/courses/teach","/courses/draft","/courses/update/basic/**",
                                 "/courses/teach/course/**","/courses/languages","/courses/search", "/courses/update/price/**",
-                                "/courses/update/learning/**","/courses/update/curriculum/sections/**","/courses/delete/curriculum/sections/**")
+                                "/courses/update/learning/**","/courses/update/curriculum/sections/**","/courses/delete/curriculum/sections/**",
+                                "/courses/update/curriculum/lectures/**","courses/update/curriculum/lectures/**")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
@@ -62,10 +63,12 @@ public class ProjectSecurityConfig {
                 .requestMatchers(antMatcher(HttpMethod.POST, "/cart/remove")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.POST,"/courses/draft")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.POST,"/courses/update/curriculum/sections/**")).hasRole("USER")
+                .requestMatchers(antMatcher(HttpMethod.POST,"/courses/update/curriculum/lectures/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.GET,"/cart/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.PUT, "/courses/update/basic/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.PUT, "/courses/update/price/**")).hasRole("USER")
-                .requestMatchers(antMatcher(HttpMethod.PUT,"/courses/update/learning/**")).permitAll()
+                .requestMatchers(antMatcher(HttpMethod.PUT,"/courses/update/learning/**")).hasRole("USER")
+                .requestMatchers(antMatcher(HttpMethod.PUT,"/courses/update/curriculum/lectures/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.GET,"/courses/my/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.GET,"/courses/my/course/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.GET,"/courses/teach")).hasRole("USER")

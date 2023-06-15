@@ -151,11 +151,13 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Section addOrUpdateLecture(Long sectionId, Long lectureId, String title, Integer durationInSeconds, Integer rank, String sourceUrl) {
-        Section section = sectionCrudRepository.findById(sectionId).orElse(null);
-        if(section == null) return null;
+    public Section updateLecture(Section section, Long lectureId, String title, Integer durationInSeconds, Integer rank, String sourceUrl) {
         Lecture lecture = lectureCrudRepository.findById(lectureId).orElse(null);
-        if(lecture != null) {
+        if(section == null) return null;
+        if(lecture !=null) {
+            if(!lecture.getSection().equals(section)) {
+                return null;
+            }
             if(title != null) {
                 lecture.setTitle(title);
             }
@@ -169,16 +171,24 @@ public class CourseServiceImpl implements CourseService {
                 lecture.setSourceUrl(sourceUrl);
             }
         } else {
-            if(title == null || durationInSeconds == null || rank == null || sourceUrl == null) return null;
-            lecture = new Lecture(title,durationInSeconds,sourceUrl,rank);
-            section.addVideo(lecture);
+            return null;
         }
         return sectionCrudRepository.save(section);
 
     }
+    @Override
+    public Section createLecture(Section section, String title, Integer durationInSeconds, Integer rank, String sourceUrl) {
+        if(section == null) return null;
+        if(title == null || durationInSeconds == null || rank == null || sourceUrl == null) return null;
+            Lecture lecture = new Lecture(title,durationInSeconds,sourceUrl,rank);
+            section.addVideo(lecture);
+        return sectionCrudRepository.save(section);
+    }
 
 
-    public List<Course> getAllCoursesForTeacher(Long userId) {
+
+
+        public List<Course> getAllCoursesForTeacher(Long userId) {
         return courseCrudRepository.findAllByUserId(userId);
     }
 
