@@ -30,7 +30,7 @@ public class Section {
 
     @OneToMany(mappedBy="section",fetch= FetchType.EAGER,cascade = CascadeType.ALL)
     @JsonView(views.Public.class)
-    private Set<Video> videos = new HashSet<>();
+    private Set<Lecture> videos = new HashSet<>();
 
 
     public Section(String title) {
@@ -74,11 +74,11 @@ public class Section {
         this.rank = rank;
     }
 
-    public Set<Video> getVideos() {
+    public Set<Lecture> getVideos() {
         return videos;
     }
 
-    public void addVideo(Video video) {
+    public void addVideo(Lecture video) {
         this.videos.add(video);
         video.setSection(this);
     }

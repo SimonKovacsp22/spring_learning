@@ -31,6 +31,9 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     SectionCrudRepository sectionCrudRepository;
 
+    @Autowired
+    LectureCrudRepository lectureCrudRepository;
+
     @Override
     public Collection<Course> getAllCoursesForCategory(Long categoryId) {
         return courseCrudRepository.findByCategoryId(categoryId);
@@ -145,6 +148,33 @@ public class CourseServiceImpl implements CourseService {
 //            sectionCrudRepository.delete(section);
         }
         return courseCrudRepository.save(course);
+    }
+
+    @Override
+    public Section addOrUpdateLecture(Long sectionId, Long lectureId, String title, Integer durationInSeconds, Integer rank, String sourceUrl) {
+        Section section = sectionCrudRepository.findById(sectionId).orElse(null);
+        if(section == null) return null;
+        Lecture lecture = lectureCrudRepository.findById(lectureId).orElse(null);
+        if(lecture != null) {
+            if(title != null) {
+                lecture.setTitle(title);
+            }
+            if(durationInSeconds != null) {
+                lecture.setDurationInSeconds(durationInSeconds);
+            }
+            if(rank != null) {
+                lecture.setRank(rank);
+            }
+            if(sourceUrl != null) {
+                lecture.setSourceUrl(sourceUrl);
+            }
+        } else {
+            if(title == null || durationInSeconds == null || rank == null || sourceUrl == null) return null;
+            lecture = new Lecture(title,durationInSeconds,sourceUrl,rank);
+            section.addVideo(lecture);
+        }
+        return sectionCrudRepository.save(section);
+
     }
 
 

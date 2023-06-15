@@ -7,7 +7,8 @@ import org.hibernate.annotations.GenericGenerator;
 import sk.posam.learning_online.domain.views.views;
 
 @Entity
-public class Video {
+@Table(name = "video")
+public class Lecture {
     @JsonView(views.Public.class)
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO,generator="native")
@@ -32,6 +33,16 @@ public class Video {
     @ManyToOne
     @JoinColumn(name = "section_id")
     private Section section;
+
+    public Lecture(String title, int durationInSeconds, String sourceUrl, int rank) {
+        this.title = title;
+        this.durationInSeconds = durationInSeconds;
+        this.sourceUrl = sourceUrl;
+        this.rank = rank;
+    }
+
+    public Lecture() {
+    }
 
     public long getId() {
         return id;

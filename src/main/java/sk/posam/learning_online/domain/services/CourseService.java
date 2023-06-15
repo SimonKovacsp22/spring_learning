@@ -2,6 +2,7 @@ package sk.posam.learning_online.domain.services;
 
 import org.springframework.data.crossstore.ChangeSetPersister;
 import sk.posam.learning_online.domain.Course;
+import sk.posam.learning_online.domain.Section;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +23,8 @@ public interface CourseService {
     Course addOrUpdateSection(Course course,String title, Long sectionId,Integer rank);
 
     Course removeSection(Course course,Long sectionId);
+
+    Section addOrUpdateLecture(Long sectionId, Long lectureId, String title,Integer durationInSeconds, Integer rank, String sourceUrl);
 
 
 

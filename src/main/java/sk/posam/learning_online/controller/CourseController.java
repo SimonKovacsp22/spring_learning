@@ -18,11 +18,9 @@ import sk.posam.learning_online.application.Impl.LanguageServiceImpl;
 import sk.posam.learning_online.application.Impl.UserServiceImpl;
 import sk.posam.learning_online.application.UserCrudRepository;
 import sk.posam.learning_online.application.WhatYouWillLearnCrudRepository;
-import sk.posam.learning_online.controller.dto.CourseRequest;
-import sk.posam.learning_online.controller.dto.PriceUpdateRequest;
-import sk.posam.learning_online.controller.dto.SectionRequest;
-import sk.posam.learning_online.controller.dto.WYWLUpdateRequest;
+import sk.posam.learning_online.controller.dto.*;
 import sk.posam.learning_online.domain.Course;
+import sk.posam.learning_online.domain.Section;
 import sk.posam.learning_online.domain.User;
 import sk.posam.learning_online.domain.views.views;
 import sk.posam.learning_online.filter.AuthoritiesLoggingAtFilter;
@@ -407,4 +405,57 @@ public class CourseController {
         }
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping(value="/update/curriculum/lectures/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<Map<String, Object>> addOrUpdateLecture(
+            @PathVariable Long id,
+            @RequestParam(name = "file", required = false) MultipartFile file,
+             @RequestParam("title") String title,
+             @RequestParam("duration") Integer duration,
+             @RequestParam("rank") Integer rank,
+             @RequestParam("sectionId") Long sectionId,
+             @RequestParam("lectureId") Long lectureId,
+             HttpServletRequest request) throws IOException {
+        Map<String, Object> response = new HashMap<>();
+        Course course = courseCrudRepository.findById(id).orElse(null);
+        if (course != null) {
+            Long userId = userServiceImpl.getIdFromAuthorizationHeader(request);
+            if (userId == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            User user = userCrudRepository.findById(userId).orElse(null);
+            if (user == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            if (!course.getUser().equals(user)) {
+                response.put("message", "This user does not have permission to update this course.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            String sourceUrl = null;
+            if(file != null) {
+            Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "video"));
+            sourceUrl = (String) uploadedFile.get("secure_url");
+            }
+            Section updatedSection = courseServiceImpl
+                    .addOrUpdateLecture(sectionId,
+                            lectureId,
+                            title,
+                            duration,
+                            rank,
+                            sourceUrl);
+            if(updatedSection != null) {
+                response.put("section",updatedSection);
+            } else {
+                response.put("message", "Not all parameters were correct or present");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+        } else {
+            response.put("message", "This course does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
+
 }
