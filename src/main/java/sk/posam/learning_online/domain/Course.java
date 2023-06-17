@@ -214,6 +214,15 @@ public class Course {
         language.addCourse(this);
     }
 
+    public void removeLanguage(Language language) {
+        this.languages.remove(language);
+        language.getCourses().remove(this);
+    }
+
+    public void setLanguages(Set<Language> languages) {
+        this.languages = languages;
+    }
+
     public Set<Section> getSections() {
         return sections;
     }

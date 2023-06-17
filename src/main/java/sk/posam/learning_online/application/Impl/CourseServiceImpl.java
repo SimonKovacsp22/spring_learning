@@ -8,12 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sk.posam.learning_online.application.*;
 import sk.posam.learning_online.domain.*;
+import sk.posam.learning_online.domain.enumeration.LanguageName;
 import sk.posam.learning_online.domain.services.CourseService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -33,6 +35,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     LectureCrudRepository lectureCrudRepository;
+@Autowired
+    LanguageCrudRepository languageCrudRepository;
 
     @Override
     public Collection<Course> getAllCoursesForCategory(Long categoryId) {
@@ -58,7 +62,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course updateCourse(Course course, String title, String subtitle, String description, String imgUrl)  {
+    public Course updateCourse(Course course, String title, String subtitle, String description,String language, String imgUrl)  {
         if(course == null) {
             return null;
         }
@@ -70,6 +74,20 @@ public class CourseServiceImpl implements CourseService {
         }
         if(description != null && !description.equals("")) {
             course.setDescription(description);
+        }
+        if(language != null) {
+            Set<Language> courseLanguages = course.getLanguages();
+            if(!courseLanguages.isEmpty()) {
+                Language courseLanguage = courseLanguages.iterator().next();
+                course.removeLanguage(courseLanguage);
+            }
+            LanguageName languageName = LanguageName.valueOf(language);
+            Language foundLanguage = languageCrudRepository.findByName(languageName).orElse(null);
+
+
+            if(foundLanguage != null) {
+                course.addLanguage(foundLanguage);
+            }
         }
         if(imgUrl != null) {
             course.setImageUrl(imgUrl);
@@ -144,10 +162,10 @@ public class CourseServiceImpl implements CourseService {
         if(course == null || section == null) {
             return null;
         }else {
+
             course.removeSection(section);
-//            sectionCrudRepository.delete(section);
-        }
         return courseCrudRepository.save(course);
+        }
     }
 
     @Override
@@ -180,15 +198,25 @@ public class CourseServiceImpl implements CourseService {
     public Section createLecture(Section section, String title, Integer durationInSeconds, Integer rank, String sourceUrl) {
         if(section == null) return null;
         if(title == null || durationInSeconds == null || rank == null || sourceUrl == null) return null;
-            Lecture lecture = new Lecture(title,durationInSeconds,sourceUrl,rank);
-            section.addVideo(lecture);
+        Lecture lecture = new Lecture(title,durationInSeconds,sourceUrl,rank);
+        section.addVideo(lecture);
         return sectionCrudRepository.save(section);
     }
 
+    @Override
+    public Section removeLecture(Section section, Long lectureId) {
+        if(section == null || lectureId == null) return null;
+        Lecture lecture = lectureCrudRepository.findById(lectureId).orElse(null);
+            if(lecture != null) {
+            section.removeLecture(lecture);
+            return sectionCrudRepository.save(section);
+            } else {
+                return null;
+            }
+    }
 
 
-
-        public List<Course> getAllCoursesForTeacher(Long userId) {
+    public List<Course> getAllCoursesForTeacher(Long userId) {
         return courseCrudRepository.findAllByUserId(userId);
     }
 

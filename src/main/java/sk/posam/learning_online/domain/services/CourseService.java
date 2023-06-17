@@ -14,7 +14,7 @@ public interface CourseService {
 
     Course getCourseForTeacher(Long userId,Long courseId) throws ChangeSetPersister.NotFoundException;
 
-    Course updateCourse(Course course, String title, String subtitle, String description, String imgUrl);
+    Course updateCourse(Course course, String title, String subtitle, String description,String language, String imgUrl);
 
     Course updateCoursePrice(Course course, Double price);
 
@@ -27,6 +27,8 @@ public interface CourseService {
     Section updateLecture(Section section, Long lectureId, String title,Integer durationInSeconds, Integer rank, String sourceUrl);
 
     Section createLecture(Section section, String title, Integer durationInSeconds, Integer rank, String sourceUrl);
+
+    Section removeLecture(Section section,Long lectureId);
 
 
 

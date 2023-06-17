@@ -82,4 +82,9 @@ public class Section {
         this.videos.add(video);
         video.setSection(this);
     }
+
+    public void removeLecture(Lecture lecture) {
+        this.videos.remove(lecture);
+
+    }
 }

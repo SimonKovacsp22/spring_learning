@@ -12,13 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sk.posam.learning_online.application.CourseCrudRepository;
+import sk.posam.learning_online.application.*;
 import sk.posam.learning_online.application.Impl.CourseServiceImpl;
 import sk.posam.learning_online.application.Impl.LanguageServiceImpl;
 import sk.posam.learning_online.application.Impl.UserServiceImpl;
-import sk.posam.learning_online.application.SectionCrudRepository;
-import sk.posam.learning_online.application.UserCrudRepository;
-import sk.posam.learning_online.application.WhatYouWillLearnCrudRepository;
 import sk.posam.learning_online.controller.dto.*;
 import sk.posam.learning_online.domain.Course;
 import sk.posam.learning_online.domain.Section;
@@ -70,6 +67,9 @@ public class CourseController {
 
     @Autowired
     WhatYouWillLearnCrudRepository whatYouWillLearnCrudRepository;
+
+    @Autowired
+    LanguageCrudRepository languageCrudRepository;
 
     @GetMapping("/{id}")
     @JsonView(views.Public.class)
@@ -252,6 +252,7 @@ public class CourseController {
             @RequestParam("title") String title,
             @RequestParam("subtitle") String subtitle,
             @RequestParam("description") String description,
+            @RequestParam("language") String language,
             HttpServletRequest request) throws IOException {
         Map<String, Object> response = new HashMap<>();
         Course course = courseCrudRepository.findById(id).orElse(null);
@@ -278,7 +279,7 @@ public class CourseController {
                 imgUrl = (String) uploadedFile.get("secure_url");
 
             }
-            Course updatedCourse = courseServiceImpl.updateCourse(course, title, subtitle, description, imgUrl);
+            Course updatedCourse = courseServiceImpl.updateCourse(course, title, subtitle, description,language, imgUrl);
             if (updatedCourse == null) {
                 response.put("message", "Internal serve errror");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -517,6 +518,47 @@ public class CourseController {
                 response.put("message", "Not all parameters were correct or present");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
+        } else {
+            response.put("message", "This course does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/delete/curriculum/lectures/{id}")
+    public ResponseEntity<Map<String, Object>> deleteLecture(@PathVariable Long id, @RequestBody LectureRequest lectureRequest, HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        Course course = courseCrudRepository.findById(id).orElse(null);
+        if (course != null) {
+            Long userId = userServiceImpl.getIdFromAuthorizationHeader(request);
+            if (userId == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            User user = userCrudRepository.findById(userId).orElse(null);
+            if (user == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            if (!course.getUser().equals(user)) {
+                response.put("message", "This user does not have permission to update this course.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            Section section = courseCrudRepository.findSectionByCourseAndId(lectureRequest.getSectionId(), id).orElse(null);
+//           Check if course matches the section
+            if (section == null) {
+                response.put("message", "This section doesn't match the course");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            Section updatedSection = courseServiceImpl.removeLecture(section,lectureRequest.getLectureId());
+            if(updatedSection != null) {
+                response.put("section",updatedSection);
+            } else {
+                response.put("message", "Something went wrong");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+
         } else {
             response.put("message", "This course does not exist");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
