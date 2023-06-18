@@ -62,7 +62,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course updateCourse(Course course, String title, String subtitle, String description,String language, String imgUrl)  {
+    public Course updateCourse(Course course, String title, String subtitle, String description,String language,Long categoryId, String imgUrl)  {
         if(course == null) {
             return null;
         }
@@ -74,6 +74,17 @@ public class CourseServiceImpl implements CourseService {
         }
         if(description != null && !description.equals("")) {
             course.setDescription(description);
+        }
+        if(categoryId != null) {
+            Category category = categoryCrudRepository.findById(categoryId).orElse(null);
+            if(category != null) {
+                Set<Category> courseCategories = course.getCategories();
+                if(!courseCategories.isEmpty()){
+                    Category courseCategory = courseCategories.iterator().next();
+                    course.removeCategory(courseCategory);
+                }
+                course.addCategory(category);
+            }
         }
         if(language != null) {
             Set<Language> courseLanguages = course.getLanguages();
@@ -213,6 +224,31 @@ public class CourseServiceImpl implements CourseService {
             } else {
                 return null;
             }
+    }
+
+    @Override
+    public Course publishCourse(Course course) {
+        if(course == null) {
+            return null;
+        }
+
+        if(
+                course.getTitle().length() >= 15
+                && course.getSubtitle().length() >=15
+                && course.getDescription().length() >=15
+                && !course.getCategories().isEmpty()
+                && !course.getLanguages().isEmpty()
+                && course.getImageUrl().length() > 0
+                && course.getWhatYouWillLearn().size() >=4
+                && course.getPrice() != null
+                && course.getSections().size() >=1
+                && !course.getSections().iterator().next().getVideos().isEmpty()
+        ) {
+            course.setDraft(false);
+            course.setLastUpdated(LocalDateTime.now());
+            return courseCrudRepository.save(course);
+        }
+        return null;
     }
 
 

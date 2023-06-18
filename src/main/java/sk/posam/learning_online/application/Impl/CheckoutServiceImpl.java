@@ -64,9 +64,9 @@ public class CheckoutServiceImpl implements CheckoutService {
 //      Set cart inactive
             Cart activeCart = cartRepositoryImpl.getActiveCart(customer.getId());
             Set<Course> coursesInCart = activeCart.getCourses();
-            if(coursesInCart.isEmpty()) {
-                throw (new RuntimeException("There are no courses in cart."));
-            }
+//            if(coursesInCart.isEmpty()) {
+//                throw (new RuntimeException("There are no courses in cart."));
+//            }
             activeCart.setActive(false);
             userCrudRepository.save(customer);
             return true;

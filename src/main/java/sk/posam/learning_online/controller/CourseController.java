@@ -227,32 +227,53 @@ public class CourseController {
         }
     }
 
+    @PostMapping("/publish/{id}")
+    public ResponseEntity<Map<String, Object>> publishCourse( @PathVariable Long id, HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        Course course = courseCrudRepository.findById(id).orElse(null);
+        if (course != null) {
+            Long userId = userServiceImpl.getIdFromAuthorizationHeader(request);
+            if (userId == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            User user = userCrudRepository.findById(userId).orElse(null);
+            if (user == null) {
+                response.put("message", "Token is not present or expired.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            if (!course.getUser().equals(user)) {
+                response.put("message", "This user does not have permission to update this course.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            Course updatedCourse = courseServiceImpl.publishCourse(course);
+            if (updatedCourse == null) {
+                response.put("message", "The course does not meet the requirements.");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            } else {
+                response.put("course", updatedCourse);
+            }
 
-//    @PutMapping(value="/update/{id}", consumes = "multipart/form-data")
-//    public ResponseEntity<Map<String,Object>> UpdateCOurse(@RequestParam("file")MultipartFile file, HttpServletRequest request) throws IOException {
-//        Map<String,Object> response = new HashMap<>();
-//
-//        try{
-//
-//            Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "video"));
-//
-//            response.put("message", "File uploaded successfully");
-//            response.put("url",uploadedFile.get("secure_url") );
-//        } catch(Exception e) {
-//            System.out.println(e);
-//
-//        }
-//        return ResponseEntity.ok(response);
-//    }
+        }else {
+            response.put("message", "This course does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
 
     @PutMapping(value = "/update/basic/{id}", consumes = "multipart/form-data")
     public ResponseEntity<Map<String, Object>> UpdateCourseLandingPage(
             @RequestParam(name = "file", required = false) MultipartFile file,
             @PathVariable Long id,
-            @RequestParam("title") String title,
-            @RequestParam("subtitle") String subtitle,
-            @RequestParam("description") String description,
-            @RequestParam("language") String language,
+            @RequestParam(value ="title",required = false) String title,
+            @RequestParam(value ="subtitle",required = false) String subtitle,
+            @RequestParam(value ="description",required = false) String description,
+            @RequestParam(value ="categoryId",required = false) Long categoryId,
+            @RequestParam(value ="language",required = false) String language,
             HttpServletRequest request) throws IOException {
         Map<String, Object> response = new HashMap<>();
         Course course = courseCrudRepository.findById(id).orElse(null);
@@ -279,7 +300,7 @@ public class CourseController {
                 imgUrl = (String) uploadedFile.get("secure_url");
 
             }
-            Course updatedCourse = courseServiceImpl.updateCourse(course, title, subtitle, description,language, imgUrl);
+            Course updatedCourse = courseServiceImpl.updateCourse(course, title, subtitle, description,language,categoryId, imgUrl);
             if (updatedCourse == null) {
                 response.put("message", "Internal serve errror");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

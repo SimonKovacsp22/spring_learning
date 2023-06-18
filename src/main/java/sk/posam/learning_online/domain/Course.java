@@ -187,6 +187,11 @@ public class Course {
         return this.categories;
     }
 
+    public void removeCategory(Category category) {
+        this.categories.remove(category);
+        category.getCourses().remove(this);
+    }
+
     public List<WhatYouWillLearn> getWhatYouWillLearn() {
         return whatYouWillLearn;
     }

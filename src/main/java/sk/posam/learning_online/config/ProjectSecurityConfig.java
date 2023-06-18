@@ -53,7 +53,7 @@ public class ProjectSecurityConfig {
                                 "/courses/teach/course/**","/courses/languages","/courses/search", "/courses/update/price/**",
                                 "/courses/update/learning/**","/courses/update/curriculum/sections/**","/courses/delete/curriculum/sections/**",
                                 "/courses/update/curriculum/lectures/**","courses/update/curriculum/lectures/**",
-                                "/courses/delete/curriculum/lectures/**")
+                                "/courses/delete/curriculum/lectures/**","/courses/publish/**")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
@@ -65,6 +65,7 @@ public class ProjectSecurityConfig {
                 .requestMatchers(antMatcher(HttpMethod.POST,"/courses/draft")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.POST,"/courses/update/curriculum/sections/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.POST,"/courses/update/curriculum/lectures/**")).hasRole("USER")
+                .requestMatchers(antMatcher(HttpMethod.POST,"/courses/publish/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.GET,"/cart/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.PUT, "/courses/update/basic/**")).hasRole("USER")
                 .requestMatchers(antMatcher(HttpMethod.PUT, "/courses/update/price/**")).hasRole("USER")
