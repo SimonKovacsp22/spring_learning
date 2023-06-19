@@ -1,5 +1,5 @@
 ﻿# Use an official OpenJDK runtime as the base image
-FROM adoptopenjdk:11-jdk-hotspot
+FROM adoptopenjdk:latest
 
 # Set the working directory
 WORKDIR /app
