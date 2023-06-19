@@ -57,4 +57,12 @@ public class Language {
     public void addCourse(Course course) {
         this.courses.add(course);
     }
+
+    @Override
+    public String toString() {
+        return "Language{" +
+                "id=" + id +
+                ", name=" + name +
+                "}";
+    }
 }

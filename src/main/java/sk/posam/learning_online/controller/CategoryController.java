@@ -34,4 +34,9 @@ public class CategoryController {
     public Collection<Course> getAllCoursesForCategory(@PathVariable("id") Long id) {
         return courseRepositoryImpl.getAllCoursesForCategory(id);
     }
+
+    @GetMapping("/public")
+    public String testPublicEndpoint(){
+        return "HELLO";
+    }
 }

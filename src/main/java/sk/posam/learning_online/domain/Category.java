@@ -50,4 +50,13 @@ public class Category {
     public void addCourseToCategory(Course course) {
         this.courses.add(course);
     }
+
+    @Override
+    public String toString() {
+        return "Category{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", courses=" + courses +
+                '}';
+    }
 }

@@ -53,7 +53,7 @@ public class ProjectSecurityConfig {
                                 "/courses/teach/course/**","/courses/languages","/courses/search", "/courses/update/price/**",
                                 "/courses/update/learning/**","/courses/update/curriculum/sections/**","/courses/delete/curriculum/sections/**",
                                 "/courses/update/curriculum/lectures/**","courses/update/curriculum/lectures/**",
-                                "/courses/delete/curriculum/lectures/**","/courses/publish/**")
+                                "/courses/delete/curriculum/lectures/**","/courses/publish/**","/categories/public")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
@@ -83,6 +83,7 @@ public class ProjectSecurityConfig {
                 .requestMatchers(antMatcher(HttpMethod.POST,"/checkout/purchase")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.POST,"/checkout")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET,"/courses/languages")).permitAll()
+                .requestMatchers(antMatcher(HttpMethod.GET,"/categories/public")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET,"/categories/**")).permitAll()
                 .requestMatchers(antMatcher(HttpMethod.GET,"/courses/**")).permitAll()
                 .and().formLogin()
@@ -92,7 +93,7 @@ public class ProjectSecurityConfig {
 
     private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:4200","http://20.54.49.58"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:4200","http://20.105.89.15"));
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowCredentials(true);
         config.setAllowedHeaders(Collections.singletonList("*"));
