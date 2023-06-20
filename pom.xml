@@ -14,7 +14,7 @@
 	<name>learning_online</name>
 	<description>Online learning platform</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
