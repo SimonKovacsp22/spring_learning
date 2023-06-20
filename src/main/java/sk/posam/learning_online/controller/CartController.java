@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sk.posam.learning_online.application.Impl.CartServiceImpl;
 import sk.posam.learning_online.application.Impl.UserServiceImpl;
-import sk.posam.learning_online.application.UserCrudRepository;
+import sk.posam.learning_online.application.repository.UserCrudRepository;
 import sk.posam.learning_online.controller.dto.CartRequest;
 import sk.posam.learning_online.domain.Cart;
 import sk.posam.learning_online.domain.User;

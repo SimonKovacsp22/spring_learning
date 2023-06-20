@@ -10,7 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-import sk.posam.learning_online.application.UserCrudRepository;
+import sk.posam.learning_online.application.repository.UserCrudRepository;
 import sk.posam.learning_online.constants.SecurityConstants;
 import sk.posam.learning_online.domain.User;
 

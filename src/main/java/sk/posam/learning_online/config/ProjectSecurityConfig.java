@@ -14,7 +14,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import sk.posam.learning_online.application.UserCrudRepository;
+import sk.posam.learning_online.application.repository.UserCrudRepository;
 import sk.posam.learning_online.filter.CsrfCookieFilter;
 import sk.posam.learning_online.filter.JWTGenerationFilter;
 import sk.posam.learning_online.filter.JWTValidationFilter;

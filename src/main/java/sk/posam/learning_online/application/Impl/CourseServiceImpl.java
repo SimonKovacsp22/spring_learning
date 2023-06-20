@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sk.posam.learning_online.application.*;
+import sk.posam.learning_online.application.repository.*;
 import sk.posam.learning_online.domain.*;
 import sk.posam.learning_online.domain.enumeration.LanguageName;
 import sk.posam.learning_online.domain.services.CourseService;
@@ -36,7 +36,7 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     LectureCrudRepository lectureCrudRepository;
 @Autowired
-    LanguageCrudRepository languageCrudRepository;
+LanguageCrudRepository languageCrudRepository;
 
     @Override
     public Collection<Course> getAllCoursesForCategory(Long categoryId) {

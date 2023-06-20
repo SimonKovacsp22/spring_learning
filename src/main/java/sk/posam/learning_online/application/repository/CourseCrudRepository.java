@@ -1,4 +1,4 @@
-package sk.posam.learning_online.application;
+package sk.posam.learning_online.application.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

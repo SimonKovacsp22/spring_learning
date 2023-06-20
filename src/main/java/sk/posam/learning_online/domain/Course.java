@@ -81,7 +81,7 @@ public class Course {
     @OneToMany(mappedBy="course",cascade = CascadeType.ALL)
     private Set<Section> sections = new HashSet<>();
 
-    @OneToMany(mappedBy = "course",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private Set<Rating> ratings = new HashSet<>();
 
     @ManyToMany
@@ -303,8 +303,8 @@ public class Course {
     @Override
     public String toString() {
         return "Course{" +
-                "progresses=" + progresses +
                 "id=" + id +
+                ", title='" + title + '\'' +
                 '}';
     }
 }

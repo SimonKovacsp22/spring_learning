@@ -10,7 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import sk.posam.learning_online.application.UserCrudRepository;
+import sk.posam.learning_online.application.repository.UserCrudRepository;
 import sk.posam.learning_online.domain.Authority;
 import sk.posam.learning_online.domain.User;
 

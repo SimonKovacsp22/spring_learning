@@ -48,7 +48,7 @@ public class User {
     @ManyToMany(mappedBy = "students",fetch = FetchType.EAGER)
     private Set<Course> coursesTaken = new HashSet<>();
     @JsonIgnore
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
     private List<Rating> ratings;
     @JsonIgnore
     @OneToMany(mappedBy = "user")
@@ -213,6 +213,15 @@ public class User {
             this.orders.add(order);
             order.setUser(this);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
     }
 }
 

@@ -2,7 +2,7 @@ package sk.posam.learning_online.application.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sk.posam.learning_online.application.LanguageCrudRepository;
+import sk.posam.learning_online.application.repository.LanguageCrudRepository;
 import sk.posam.learning_online.domain.Language;
 import sk.posam.learning_online.domain.services.LanguageService;
 

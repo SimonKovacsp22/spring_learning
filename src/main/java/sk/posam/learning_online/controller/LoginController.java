@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sk.posam.learning_online.application.UserCrudRepository;
+import sk.posam.learning_online.application.repository.UserCrudRepository;
 import sk.posam.learning_online.domain.Authority;
 import sk.posam.learning_online.domain.User;
 
