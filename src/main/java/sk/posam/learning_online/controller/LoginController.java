@@ -11,15 +11,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sk.posam.learning_online.application.repository.UserCrudRepository;
+import sk.posam.learning_online.controller.dto.UserDto;
 import sk.posam.learning_online.domain.Authority;
 import sk.posam.learning_online.domain.User;
+import sk.posam.learning_online.filter.AuthoritiesLoggingAtFilter;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 @RestController
 public class LoginController {
+    private final Logger LOG =
+            Logger.getLogger(AuthoritiesLoggingAtFilter.class.getName());
 
     @Autowired
     private UserCrudRepository userCrudRepository;
@@ -37,7 +44,7 @@ public class LoginController {
             user.setCreateDt(LocalDateTime.now());
 
             user.setRole("user");
-            			Set<Authority> authoritiesSet = new HashSet<>();
+            Set<Authority> authoritiesSet = new HashSet<>();
 			authoritiesSet.add(new Authority("ROLE_USER"));
             user.setAuthorities(authoritiesSet);
             savedUser = userCrudRepository.save(user);
@@ -66,12 +73,16 @@ public class LoginController {
     }
 
     @RequestMapping("/user")
-    public User getUserDetailsAfterLogin(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> getUserDetailsAfterLogin(Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
         User user = userCrudRepository.findByEmail(authentication.getName()).orElse(null);
+        LOG.info("here");
         if (user != null) {
-            return user;
+            response.put("user",new UserDto(user));
+            return ResponseEntity.ok(response);
         } else {
-            return null;
+            response.put("error","Wrong credentials. User not found.");
+            return ResponseEntity.ok(response);
         }
 
     }
